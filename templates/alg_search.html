@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algolia Search</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css/themes/reset.css">
+    <script type="module">
+        import { liteClient as algoliasearch } from "https://cdn.jsdelivr.net/npm/algoliasearch/lite";
+        import instantsearch from "https://cdn.jsdelivr.net/npm/instantsearch.js";
+        import { searchBox, hits, configure, poweredBy } from "https://cdn.jsdelivr.net/npm/instantsearch.js/es/widgets";
+
+        const searchClient = algoliasearch("TWHEVSW4CG", "a9d8d956097f981a94c1f49f502ed23a");
+
+        const search = instantsearch({
+            indexName: "movie",
+            searchClient,
+            onStateChange({ uiState, setUiState }) {
+                const hitsContainer = document.querySelector("#hits");
+                const footerContainer = document.querySelector("#algolia-footer");
+                if (!uiState["movie"]?.query) {
+                    hitsContainer.classList.add("hide-content");
+                    footerContainer?.classList.add("hide-content");
+                    setUiState(uiState);
+                    return;
+                }
+                hitsContainer.classList.remove("hide-content");
+                footerContainer?.classList.remove("hide-content");
+                setUiState(uiState);
+            },
+        });
+
+        search.addWidgets([
+            searchBox({
+                container: "#searchbox",
+                placeholder: "Search your data here",
+            }),
+            configure({
+                hitsPerPage: 3,
+            }),
+            poweredBy({
+                container: "#algolia-footer",
+            }),
+            hits({
+                container: "#hits",
+                templates: {
+                    item: (hit, { html, components }) => html`
+                        <div class="hit-item">
+                            <picture>
+                                <img src="${hit.posterPath}" alt="${hit.title}" />
+                            </picture>
+                            <div>
+                                <p class="primary-text">${components.Highlight({ hit, attribute: "title" })}</p>
+                                <p class="secondary-text">${components.Highlight({ hit, attribute: "overview" })}</p>
+                            </div>
+                        </div>
+                    `,
+                },
+            }),
+        ]);
+        search.start();
+    </script>
+    <style>
+        .ais-InstantSearch { max-width: 800px; margin: auto; padding: 20px; }
+        .ais-Hits-item { display: flex; align-items: center; gap: 10px; }
+        .ais-Hits-item img { width: 50px; height: 50px; object-fit: cover; }
+        .hide-content { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="ais-InstantSearch">
+        <div id="searchbox"></div>
+        <div id="hits" class="hide-content"></div>
+        <div id="algolia-footer" class="hide-content"></div>
+    </div>
+    <script src="alg.js"></script>
+</body>
+</html>

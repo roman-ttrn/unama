@@ -5,6 +5,14 @@ name = "pypi"
 
 [packages]
 django = "*"
+pyyaml = "*"
+django-cors-headers = "*"
+requests = "*"
+djangorestframework = "*"
+rest-framework-simplejwt = "*"
+rich = "*"
+algoliasearch-django = "*"
+algoliasearch = "*"
 
 [dev-packages]
 
